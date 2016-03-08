@@ -1,0 +1,12 @@
+{
+  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+	"SQLServerName": { "value": "changeme" },
+	"SQLAdministratorLogin": {"value": "changeme"},
+	"SQLAdministratorLoginPassword": {"value": "GEN-PASSWORD"},
+	"ElasticPoolName": {"value": "changeme"},
+	"ElasticPoolEdition": {"value": "changeme"},
+	"DatabaseName": {"value": "changeme"}
+  }
+}
