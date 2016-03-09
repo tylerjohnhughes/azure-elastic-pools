@@ -1,7 +1,7 @@
 {
-  "itemDisplayName": "201-sql-elasticpools",
-  "description": "Creates a SQL server with an Elastic Pool.",
-  "summary": "This template creates a new SQL server and adds a new Elastic Pool to the server. A new database will be assigned to the pool.",
-  "githubUsername": "brianmowens",
-  "dateUpdated": "2016-03-08>"
+    "itemDisplayName": "201-sql-elasticpools",
+    "description": "Creates a SQL server with an Elastic Pool.",
+    "summary": "This template creates a new SQL server and adds a new Elastic Pool to the server. A new database will be assigned to the pool.",
+    "githubUsername": "brianmowens",
+    "dateUpdated": "2016-03-08"
 }

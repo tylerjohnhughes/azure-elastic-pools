@@ -1,134 +1,195 @@
 {
-  "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "parameters": {
-		"SQLServerName": { 
-		"type": "string",
-		"metadata": {
-			"description": "The name of your SQL server."
-		}
-	},
-	"SQLAdministratorLogin": {
-		"type": "string",
-		"metadata": {
-			"description": "The administrator username for the SQL server."
-		}
-	},
-	"SQLAdministratorLoginPassword": {
-		"type": "securestring",
-		"metadata": {
-			"description": "The password for the SQL server administrator user."
-		}
-	},
-	"ElasticPoolName": {
-		"type": "string",
-		"metadata": {
-			"description": "The name that will be given to the Elastic Pool."
-		}
-	},
-	"ElasticPoolEdition": {
-		"type": "string",
-		"allowedValues": [
-			"Basic",
-			"Standard",
-			"Premium"
-		],
-		"metadata": {
-			"description": "The pricing tier of the Elastic Pool."
-		}
-	},
-	"DatabaseName": {
-		"type": "string",
-		"metadata": {
-			"description": "The name that will be given to the SQL database."
-		}
-	}
-  },
-  "variables": {
-	"ElasticSettingsBasic": {
-		"DBmaxSizeBytes": "2147483648",
-		"databaseDtuMin": ["0", "5"],
-		"databaseDtuMax": ["5"],
-		"poolDtu": ["100", "200", "400", "800", "1200"],
-		"poolStorageMB": ["10240", "20480", "39936", "79872", "119808"]
-	},
-	"ElasticSettingsStandard": {
-		"DBmaxSizeBytes": "268435456000",
-		"databaseDtuMin": ["0", "10", "20", "50", "100"],
-		"databaseDtuMax": ["10", "20", "50", "100"],
-		"poolDtu": ["100", "200", "400", "800", "1200"],
-		"poolStorageMB": ["102400", "204800", "409600", "819200", "1680000"]
-	},
-	"ElasticSettingsPremium": {
-		"DBmaxSizeBytes": "536870912000",
-		"databaseDtuMin": ["0", "125", "250", "500", "1000"],
-		"databaseDtuMax": ["125", "250", "500", "1000"],
-		"poolDtu": ["125", "250", "500", "1000", "1500"],
-		"poolStorageMB": ["256000", "512000", "768000"]
-	},
-	"ElasticSettings": "[variables(concat('ElasticSettings', parameters('ElasticPoolEdition')))]",
-	"ResourceLocation": "East US",
-	"DatabaseCollation": "SQL_Latin1_General_CP1_CI_AS"
-  },
-"resources": [
-		{
-			"name": "[parameters('SQLServerName')]",
-			"type": "Microsoft.Sql/servers",
-			"location": "[variables('ResourceLocation')]",
-			"apiVersion": "2014-04-01-preview",
-			"properties": {
-				"administratorLogin": "[parameters('SQLAdministratorLogin')]",
-				"administratorLoginPassword": "[parameters('SQLAdministratorLoginPassword')]",
-				"version": "12.0"
-			},
-			"resources": [
-			{
-				"name": "[parameters('ElasticPoolName')]",
-				"type": "elasticPools",
-				"location": "[variables('ResourceLocation')]",
-				"kind": null,
-				"apiVersion": "2014-04-01-preview",
-				"dependsOn": [
-					"[concat('Microsoft.Sql/Servers/', parameters('SQLServerName'))]"
-				],
-				"properties": {
-					"edition": "[parameters('ElasticPoolEdition')]",
-					"dtu": "[variables('ElasticSettings').poolDtu[0]]",
-					"databaseDtuMin": "[variables('ElasticSettings').databaseDtuMin[0]]",
-					"databaseDtuMax": "[variables('ElasticSettings').databaseDtuMax[0]]",
-					"storageMB": "[variables('ElasticSettings').poolStorageMB[0]]"
-				}
-			},
-			{
-			  "apiVersion": "2014-04-01-preview",
-			  "dependsOn": [
-			  "[concat('Microsoft.Sql/servers/', parameters('SQLServerName'))]"
-			  ],
-			  "location": "[variables('ResourceLocation')]",
-			  "name": "AllowAllWindowsAzureIps",
-			  "properties": {
-				"endIpAddress": "0.0.0.0",
-				"startIpAddress": "0.0.0.0"
-			  },
-			  "type": "firewallrules"
-			},
-			{
-				"name": "[parameters('DatabaseName')]",
-				"type": "databases",
-				"location": "[variables('ResourceLocation')]",
-				"apiVersion": "2014-04-01-preview",
-				"dependsOn": [
-					"[concat('Microsoft.Sql/servers/', parameters('SQLServerName'))]",
-					"[concat('Microsoft.Sql/servers/', parameters('SQLServerName'), '/elasticPools/', parameters('ElasticPoolName'))]"
-				],
-				"properties": {
-					"edition": "[parameters('ElasticPoolEdition')]",
-					"collation": "[variables('DatabaseCollation')]",
-					"maxSizeBytes": "[variables('ElasticSettings').DBmaxSizeBytes]",
-					"elasticPoolName": "[parameters('ElasticPoolName')]"
-				}
-			}
-			]
-		}
-	]
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "sqlServerName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name of your SQL server."
+            }
+        },
+        "sqlAdministratorLogin": {
+            "type": "string",
+            "metadata": {
+                "description": "The administrator username for the SQL server."
+            }
+        },
+        "sqlAdministratorLoginPassword": {
+            "type": "securestring",
+            "metadata": {
+                "description": "The password for the SQL server administrator user."
+            }
+        },
+        "elasticPoolName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name that will be given to the Elastic Pool."
+            }
+        },
+        "elasticPoolEdition": {
+            "type": "string",
+            "allowedValues": [
+                "Basic",
+                "Standard",
+                "Premium"
+            ],
+            "metadata": {
+                "description": "The pricing tier of the Elastic Pool."
+            }
+        },
+        "databaseName": {
+            "type": "string",
+            "metadata": {
+                "description": "The name that will be given to the SQL database."
+            }
+        }
+    },
+    "variables": {
+        "elasticSettingsBasic": {
+            "dbMaxSizeBytes": "2147483648",
+            "databaseDtuMin": [
+                "0",
+                "5"
+            ],
+            "databaseDtuMax": [
+                "5"
+            ],
+            "poolDtu": [
+                "100",
+                "200",
+                "400",
+                "800",
+                "1200"
+            ],
+            "poolStorageMB": [
+                "10240",
+                "20480",
+                "39936",
+                "79872",
+                "119808"
+            ]
+        },
+        "elasticSettingsStandard": {
+            "dbMaxSizeBytes": "268435456000",
+            "databaseDtuMin": [
+                "0",
+                "10",
+                "20",
+                "50",
+                "100"
+            ],
+            "databaseDtuMax": [
+                "10",
+                "20",
+                "50",
+                "100"
+            ],
+            "poolDtu": [
+                "100",
+                "200",
+                "400",
+                "800",
+                "1200"
+            ],
+            "poolStorageMB": [
+                "102400",
+                "204800",
+                "409600",
+                "819200",
+                "1680000"
+            ]
+        },
+        "elasticSettingsPremium": {
+            "dbMaxSizeBytes": "536870912000",
+            "databaseDtuMin": [
+                "0",
+                "125",
+                "250",
+                "500",
+                "1000"
+            ],
+            "databaseDtuMax": [
+                "125",
+                "250",
+                "500",
+                "1000"
+            ],
+            "poolDtu": [
+                "125",
+                "250",
+                "500",
+                "1000",
+                "1500"
+            ],
+            "poolStorageMB": [
+                "256000",
+                "512000",
+                "768000"
+            ]
+        },
+        "elasticSettings": "[variables(concat('elasticSettings', parameters('elasticPoolEdition')))]",
+        "databaseCollation": "SQL_Latin1_General_CP1_CI_AS",
+        "azureApiVersion": "2014-04-01-preview",
+		"sqlServerVersion": "12.0"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Sql/servers",
+            "name": "[parameters('sqlServerName')]",
+            "location": "[resourceGroup().location]",
+            "apiVersion": "[variable('azureApiVersion')]",
+            "properties": {
+                "administratorLogin": "[parameters('sqlAdministratorLogin')]",
+                "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
+                "version": "[variables('sqlServerVersion')]"
+            },
+            "resources": [
+                {
+                    "type": "elasticPools",
+                    "name": "[parameters('elasticPoolName')]",
+                    "location": "[resourceGroup().location]",
+                    "apiVersion": "[variable('azureApiVersion')]",
+                    "properties": {
+                        "edition": "[parameters('elasticPoolEdition')]",
+                        "dtu": "[variables('elasticSettings').poolDtu[0]]",
+                        "databaseDtuMin": "[variables('elasticSettings').databaseDtuMin[0]]",
+                        "databaseDtuMax": "[variables('elasticSettings').databaseDtuMax[0]]",
+                        "storageMB": "[variables('elasticSettings').poolStorageMB[0]]"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/Servers/', parameters('sqlServerName'))]"
+                    ]
+                },
+                {
+                    "type": "firewallrules",
+                    "name": "AllowAllWindowsAzureIps",
+                    "location": "[resourceGroup().location]",
+                    "apiVersion": "[variable('azureApiVersion')]",
+                    "properties": {
+                        "startIpAddress": "0.0.0.0",
+                        "endIpAddress": "0.0.0.0"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]"
+                    ]
+                },
+                {
+                    "type": "databases",
+                    "name": "[parameters('databaseName')]",
+                    "location": "[resourceGroup().location]",
+                    "apiVersion": "[variable('azureApiVersion')]",
+                    "properties": {
+                        "edition": "[parameters('elasticPoolEdition')]",
+                        "collation": "[variables('databaseCollation')]",
+                        "maxSizeBytes": "[variables('elasticSettings').dbMaxSizeBytes]",
+                        "elasticPoolName": "[parameters('elasticPoolName')]"
+                    },
+                    "dependsOn": [
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'))]",
+                        "[concat('Microsoft.Sql/servers/', parameters('sqlServerName'), '/elasticPools/', parameters('elasticPoolName'))]"
+                    ]
+                }
+            ]
+        }
+    ]
 }
