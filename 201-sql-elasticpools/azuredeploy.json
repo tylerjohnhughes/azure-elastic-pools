@@ -62,11 +62,11 @@
                 "1200"
             ],
             "poolStorageMB": [
-                "10240",
-                "20480",
-                "39936",
-                "79872",
-                "119808"
+                "10000",
+                "20000",
+                "40000",
+                "80000",
+                "120000"
             ]
         },
         "elasticSettingsStandard": {
@@ -96,7 +96,7 @@
                 "204800",
                 "409600",
                 "819200",
-                "1680000"
+                "1228800"
             ]
         },
         "elasticSettingsPremium": {
@@ -137,7 +137,7 @@
             "type": "Microsoft.Sql/servers",
             "name": "[parameters('sqlServerName')]",
             "location": "[resourceGroup().location]",
-            "apiVersion": "[variable('azureApiVersion')]",
+            "apiVersion": "[variables('azureApiVersion')]",
             "properties": {
                 "administratorLogin": "[parameters('sqlAdministratorLogin')]",
                 "administratorLoginPassword": "[parameters('sqlAdministratorLoginPassword')]",
@@ -148,7 +148,7 @@
                     "type": "elasticPools",
                     "name": "[parameters('elasticPoolName')]",
                     "location": "[resourceGroup().location]",
-                    "apiVersion": "[variable('azureApiVersion')]",
+                    "apiVersion": "[variables('azureApiVersion')]",
                     "properties": {
                         "edition": "[parameters('elasticPoolEdition')]",
                         "dtu": "[variables('elasticSettings').poolDtu[0]]",
@@ -164,7 +164,7 @@
                     "type": "firewallrules",
                     "name": "AllowAllWindowsAzureIps",
                     "location": "[resourceGroup().location]",
-                    "apiVersion": "[variable('azureApiVersion')]",
+                    "apiVersion": "[variables('azureApiVersion')]",
                     "properties": {
                         "startIpAddress": "0.0.0.0",
                         "endIpAddress": "0.0.0.0"
@@ -177,7 +177,7 @@
                     "type": "databases",
                     "name": "[parameters('databaseName')]",
                     "location": "[resourceGroup().location]",
-                    "apiVersion": "[variable('azureApiVersion')]",
+                    "apiVersion": "[variables('azureApiVersion')]",
                     "properties": {
                         "edition": "[parameters('elasticPoolEdition')]",
                         "collation": "[variables('databaseCollation')]",
